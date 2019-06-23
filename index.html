@@ -30,6 +30,9 @@
             .plus {
                 color: green;
             }
+            .plus {
+                color: blue;
+            }
             .value {
                 min-width: 2em;
             }
@@ -39,31 +42,42 @@
         </style>
     </head>
     <body>
-        <div class="buttons">
+        <!-- <div class="buttons">
             <div class="minus button">-</div>
             <div class="value">?</div>
             <div class="plus button">+</div>
+            <div class="send button">send</div>
+        </div> -->
+        Input :<br>
+        <input id="message" type="text" name="firstname" value="Mickey">
+        <br>
+        <div>
+          Reply:
+          <span class="reply"></span>
         </div>
+        <input class="submit" type="submit" value="Submit">
+
         <div class="state">
             <span class="users">?</span> online
         </div>
         <script>
-            var minus = document.querySelector('.minus'),
-                plus = document.querySelector('.plus'),
-                value = document.querySelector('.value'),
+            var submit = document.querySelector('.submit'),
+                reply = document.querySelector('.reply'),
                 users = document.querySelector('.users'),
                 websocket = new WebSocket("ws://127.0.0.1:6789/");
-            minus.onclick = function (event) {
-                websocket.send(JSON.stringify({action: 'minus'}));
+
+            submit.onclick = function (event) {
+                msg = document.getElementById('message').value
+                websocket.send(JSON.stringify({action: 'submit', message: msg}));
             }
-            plus.onclick = function (event) {
-                websocket.send(JSON.stringify({action: 'plus'}));
-            }
+
             websocket.onmessage = function (event) {
                 data = JSON.parse(event.data);
+                console.log(data)
                 switch (data.type) {
-                    case 'state':
-                        value.textContent = data.value;
+                    case 'reply':
+                        console.log(data)
+                        reply.textContent = data.value;
                         break;
                     case 'users':
                         users.textContent = (

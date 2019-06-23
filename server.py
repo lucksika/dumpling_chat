@@ -6,22 +6,28 @@ import asyncio
 import json
 import logging
 import websockets
+import random
+
+conversation = ["I don't understand", "Hi", "How are you", "What's that", "Ha Ha Ha", "Sleepy", "Yee-haa cowboy"]
 
 logging.basicConfig()
 
-STATE = {'value': 0}
-
+STATE = {'value': "waiting..."}
 USERS = set()
 
 def state_event():
-    return json.dumps({'type': 'state', **STATE})
-
+    return json.dumps({'type': 'reply', **STATE})
 def users_event():
     return json.dumps({'type': 'users', 'count': len(USERS)})
 
 async def notify_state():
     if USERS:       # asyncio.wait doesn't accept an empty list
         message = state_event()
+        await asyncio.wait([user.send(message) for user in USERS])
+
+async def notify_msg():
+    if USERS:       # asyncio.wait doesn't accept an empty list
+        message = message_event()
         await asyncio.wait([user.send(message) for user in USERS])
 
 async def notify_users():
@@ -44,8 +50,12 @@ async def counter(websocket, path):
         await websocket.send(state_event())
         async for message in websocket:
             data = json.loads(message)
-            if data['action'] == 'minus':
-                STATE['value'] -= 1
+            if data['action'] == 'submit':
+                index = random.randint(0,len(conversation) - 1)
+                reply = conversation[index]
+                if index == 0 or index == 2:
+                    reply = " '" +  data['message'] +  "' ??? " + reply
+                STATE['value'] = reply
                 await notify_state()
             elif data['action'] == 'plus':
                 STATE['value'] += 1
