@@ -12,7 +12,7 @@ conversation = ["I don't understand", "Hi", "How are you", "What's that", "Ha Ha
 
 logging.basicConfig()
 
-STATE = {'value': "waiting..."}
+STATE = {'value': "waiting you na ja..."}
 USERS = set()
 
 def state_event():

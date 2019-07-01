@@ -71,6 +71,7 @@
                 websocket.send(JSON.stringify({action: 'submit', message: msg}));
             }
 
+
             websocket.onmessage = function (event) {
                 data = JSON.parse(event.data);
                 console.log(data)
