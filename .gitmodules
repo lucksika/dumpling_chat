@@ -1,0 +1,3 @@
+[submodule "Desktop/los_bot"]
+	path = Desktop/los_bot
+	url = https://github.com/lucksika/dumpling_chat.git
