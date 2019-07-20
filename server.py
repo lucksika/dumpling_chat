@@ -7,27 +7,23 @@ import json
 import logging
 import websockets
 import random
+from bot import chatbot
 
-conversation = ["I don't understand", "Hi", "How are you", "What's that", "Ha Ha Ha", "Sleepy", "Yee-haa cowboy"]
+dp_bot = chatbot()
 
 logging.basicConfig()
 
-STATE = {'value': "waiting you na ja..."}
+STATE = {"text": ""}
 USERS = set()
 
 def state_event():
-    return json.dumps({'type': 'reply', **STATE})
+    return json.dumps({'type': 'bot', **STATE})
 def users_event():
     return json.dumps({'type': 'users', 'count': len(USERS)})
 
 async def notify_state():
     if USERS:       # asyncio.wait doesn't accept an empty list
         message = state_event()
-        await asyncio.wait([user.send(message) for user in USERS])
-
-async def notify_msg():
-    if USERS:       # asyncio.wait doesn't accept an empty list
-        message = message_event()
         await asyncio.wait([user.send(message) for user in USERS])
 
 async def notify_users():
@@ -50,16 +46,11 @@ async def counter(websocket, path):
         await websocket.send(state_event())
         async for message in websocket:
             data = json.loads(message)
-            if data['action'] == 'submit':
-                index = random.randint(0,len(conversation) - 1)
-                reply = conversation[index]
-                if index == 0 or index == 2:
-                    reply = " '" +  data['message'] +  "' ??? " + reply
-                STATE['value'] = reply
+            if data['type'] == 'client':
+                reply = dp_bot.reply(data['text'])
+                STATE['text'] = reply
                 await notify_state()
-            elif data['action'] == 'plus':
-                STATE['value'] += 1
-                await notify_state()
+
             else:
                 logging.error(
                     "unsupported event: {}", data)
