@@ -1,0 +1,6 @@
+.DS_Store
+/model
+los_bot/node_modules
+los_bot/src/components/icons/*.png
+los_bot/README.md
+/__pycache__
